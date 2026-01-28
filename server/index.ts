@@ -2,9 +2,15 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const httpServer = createServer(app);
+
+// Get current directory for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure allowed origins for CORS
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
@@ -15,8 +21,15 @@ const validateOrigin = (origin: string | undefined, callback: (err: Error | null
   // Allow requests with no origin (like mobile apps or curl requests)
   if (!origin) return callback(null, true);
   
-  // Check if the origin is in the allowed list (exact match)
-  if (allowedOrigins.includes(origin)) {
+  // Allow same-origin requests (when frontend is served from same server)
+  const serverPort = process.env.PORT || '3001';
+  const sameOriginUrls = [
+    `http://localhost:${serverPort}`,
+    `https://localhost:${serverPort}`,
+  ];
+  
+  // Check if the origin is in the allowed list or is same-origin
+  if (allowedOrigins.includes(origin) || sameOriginUrls.includes(origin)) {
     callback(null, true);
   } else {
     callback(new Error('Not allowed by CORS'));
@@ -36,6 +49,10 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Serve static files from the dist directory in production
+const distPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(distPath, { index: 'index.html' }));
 
 // Store active rooms and users
 interface User {
@@ -232,6 +249,17 @@ io.on('connection', (socket) => {
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// Root route handler
+app.get('/', (req, res) => {
+  const indexPath = path.join(distPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      // If the file doesn't exist (development mode), send a welcome message
+      res.send('Welcome to the DND Party Chat server!');
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3001;
