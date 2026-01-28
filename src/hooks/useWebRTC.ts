@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Socket } from 'socket.io-client';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Socket } from "socket.io-client";
 
 interface UseWebRTCProps {
   socket: Socket | null;
@@ -13,8 +13,8 @@ interface PeerConnection {
 
 const configuration: RTCConfiguration = {
   iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
   ],
 };
 
@@ -39,12 +39,14 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
 
       // Handle incoming stream
       peerConnection.ontrack = (event) => {
+        console.log("ontrack fired for", targetUserId, event.streams);
         const [remoteStream] = event.streams;
         setPeers((prev) => {
           const newPeers = new Map(prev);
           const peer = newPeers.get(targetUserId);
           if (peer) {
-            peer.stream = remoteStream;
+            // Create a NEW object so React detects the change
+            newPeers.set(targetUserId, { ...peer, stream: remoteStream });
           }
           return newPeers;
         });
@@ -53,7 +55,7 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
       // Handle ICE candidates
       peerConnection.onicecandidate = (event) => {
         if (event.candidate && socket) {
-          socket.emit('webrtc-ice-candidate', {
+          socket.emit("webrtc-ice-candidate", {
             targetId: targetUserId,
             candidate: event.candidate.toJSON(),
           });
@@ -61,12 +63,14 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
       };
 
       peerConnection.oniceconnectionstatechange = () => {
-        console.log(`ICE connection state: ${peerConnection.iceConnectionState}`);
+        console.log(
+          `ICE connection state: ${peerConnection.iceConnectionState}`,
+        );
       };
 
       return peerConnection;
     },
-    [localStream, socket]
+    [localStream, socket],
   );
 
   const createOffer = useCallback(
@@ -74,21 +78,23 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
       if (!socket) return;
 
       const peerConnection = createPeerConnection(targetUserId);
-      setPeers((prev) => new Map(prev).set(targetUserId, { connection: peerConnection }));
+      setPeers((prev) =>
+        new Map(prev).set(targetUserId, { connection: peerConnection }),
+      );
 
       try {
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
 
-        socket.emit('webrtc-offer', {
+        socket.emit("webrtc-offer", {
           targetId: targetUserId,
           offer: offer,
         });
       } catch (error) {
-        console.error('Error creating offer:', error);
+        console.error("Error creating offer:", error);
       }
     },
-    [socket, createPeerConnection]
+    [socket, createPeerConnection],
   );
 
   const handleOffer = useCallback(
@@ -97,22 +103,26 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
 
       const { userId: senderId, offer } = data;
       const peerConnection = createPeerConnection(senderId);
-      setPeers((prev) => new Map(prev).set(senderId, { connection: peerConnection }));
+      setPeers((prev) =>
+        new Map(prev).set(senderId, { connection: peerConnection }),
+      );
 
       try {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        await peerConnection.setRemoteDescription(
+          new RTCSessionDescription(offer),
+        );
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
-        socket.emit('webrtc-answer', {
+        socket.emit("webrtc-answer", {
           targetId: senderId,
           answer: answer,
         });
       } catch (error) {
-        console.error('Error handling offer:', error);
+        console.error("Error handling offer:", error);
       }
     },
-    [socket, createPeerConnection]
+    [socket, createPeerConnection],
   );
 
   const handleAnswer = useCallback(
@@ -122,13 +132,15 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
 
       if (peer) {
         try {
-          await peer.connection.setRemoteDescription(new RTCSessionDescription(answer));
+          await peer.connection.setRemoteDescription(
+            new RTCSessionDescription(answer),
+          );
         } catch (error) {
-          console.error('Error handling answer:', error);
+          console.error("Error handling answer:", error);
         }
       }
     },
-    []
+    [],
   );
 
   const handleIceCandidate = useCallback(
@@ -140,11 +152,11 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
         try {
           await peer.connection.addIceCandidate(new RTCIceCandidate(candidate));
         } catch (error) {
-          console.error('Error adding ICE candidate:', error);
+          console.error("Error adding ICE candidate:", error);
         }
       }
     },
-    []
+    [],
   );
 
   const closePeerConnection = useCallback((targetUserId: string) => {
@@ -170,14 +182,14 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('webrtc-offer', handleOffer);
-    socket.on('webrtc-answer', handleAnswer);
-    socket.on('webrtc-ice-candidate', handleIceCandidate);
+    socket.on("webrtc-offer", handleOffer);
+    socket.on("webrtc-answer", handleAnswer);
+    socket.on("webrtc-ice-candidate", handleIceCandidate);
 
     return () => {
-      socket.off('webrtc-offer', handleOffer);
-      socket.off('webrtc-answer', handleAnswer);
-      socket.off('webrtc-ice-candidate', handleIceCandidate);
+      socket.off("webrtc-offer", handleOffer);
+      socket.off("webrtc-answer", handleAnswer);
+      socket.off("webrtc-ice-candidate", handleIceCandidate);
     };
   }, [socket, handleOffer, handleAnswer, handleIceCandidate]);
 
