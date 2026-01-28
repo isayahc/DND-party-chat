@@ -1,1 +1,1 @@
-web: bun run server/index.ts
+web: npm run start

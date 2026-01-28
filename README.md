@@ -205,12 +205,12 @@ Railway is a cloud platform that makes deploying applications simple. This proje
    - Go to your project's backend service settings
    - Add the following environment variables:
      ```
-     PORT=(leave empty, Railway will auto-assign)
      CLIENT_URL=https://your-frontend-url.railway.app
      NODE_ENV=production
      ```
-   - Set the **Start Command**: `bun run start`
-   - Set the **Build Command**: `bun install && bun run build`
+   - Note: Railway automatically provides the `PORT` environment variable, so you don't need to set it
+   - The **Start Command** is set in `railway.json`: `npm run start`
+   - The **Build Command** is set in `railway.json`: `npm install && npm run build`
 
 3. **Configure the Frontend Service (Separate Deployment)**
    - For the frontend, you'll need a separate deployment
@@ -247,10 +247,10 @@ Railway is a cloud platform that makes deploying applications simple. This proje
 
 4. **Set Environment Variables**
    ```bash
-   railway variables set PORT=
    railway variables set CLIENT_URL=https://your-frontend-url.railway.app
    railway variables set NODE_ENV=production
    ```
+   Note: Railway automatically provides the `PORT` environment variable
 
 5. **Deploy**
    ```bash
@@ -263,7 +263,7 @@ For the **backend service**, configure these variables in Railway:
 
 | Variable | Description | Example Value |
 |----------|-------------|---------------|
-| `PORT` | Server port (auto-assigned by Railway, leave empty) | - |
+| `PORT` | Server port (automatically provided by Railway) | Not needed - Railway sets this |
 | `CLIENT_URL` | Frontend URL(s), comma-separated for multiple origins | `https://your-app.railway.app` |
 | `NODE_ENV` | Environment mode | `production` |
 
