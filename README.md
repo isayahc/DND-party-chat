@@ -101,3 +101,35 @@ Preview the production build:
 ```bash
 bun run preview
 ```
+
+### Storybook
+Storybook is set up for isolated component development and testing.
+
+#### Start Storybook
+Run Storybook in development mode:
+```bash
+npm run storybook
+```
+
+The Storybook UI will be available at `http://localhost:6006`.
+
+#### Build Storybook
+Build a static version of Storybook:
+```bash
+npm run build-storybook
+```
+
+#### Available Components
+- **ChatMessage**: Display chat messages with sender, character name, and timestamp
+- **VoiceCallControls**: Voice call controls with mute, call, and speaker buttons
+
+#### Testing Components
+Storybook includes several addons:
+- **Accessibility (a11y)**: Automatically checks components for accessibility issues
+- **Docs**: Auto-generated documentation for components
+- **Vitest**: Test integration for components
+
+To run component tests:
+```bash
+npx vitest --project=storybook
+```
