@@ -25,7 +25,6 @@ const validateOrigin = (origin: string | undefined, callback: (err: Error | null
   const serverPort = process.env.PORT || '3001';
   const sameOriginUrls = [
     `http://localhost:${serverPort}`,
-    `https://localhost:${serverPort}`,
   ];
   
   // Check if the origin is in the allowed list or is same-origin
@@ -50,9 +49,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Serve static files from the dist directory in production
+// Serve static files from the dist directory in production (but not index.html at root)
 const distPath = path.join(__dirname, '..', 'dist');
-app.use(express.static(distPath, { index: 'index.html' }));
+app.use(express.static(distPath));
 
 // Store active rooms and users
 interface User {
@@ -255,9 +254,10 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   const indexPath = path.join(distPath, 'index.html');
   res.sendFile(indexPath, (err) => {
-    if (err) {
+    // Only send fallback if headers haven't been sent yet
+    if (err && !res.headersSent) {
       // If the file doesn't exist (development mode), send a welcome message
-      res.send('Welcome to the DND Party Chat server!');
+      res.status(200).send('Welcome to the DND Party Chat server!');
     }
   });
 });
