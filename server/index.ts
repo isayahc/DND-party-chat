@@ -56,7 +56,13 @@ const distCandidates = [
   path.join(__dirname, '..', 'dist'),
   path.join(__dirname, '..', '..', 'dist'),
 ];
-const resolvedDistPath = distCandidates.find(candidate => fs.existsSync(candidate));
+const resolvedDistPath = distCandidates.find(candidate => {
+  try {
+    return fs.statSync(candidate).isDirectory();
+  } catch {
+    return false;
+  }
+});
 const distPath = resolvedDistPath ?? distCandidates[0];
 if (!resolvedDistPath) {
   console.warn(`No dist directory found in expected locations. Falling back to ${distPath}.`);
