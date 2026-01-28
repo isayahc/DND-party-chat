@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const app = express();
@@ -50,7 +51,12 @@ app.use(cors({
 app.use(express.json());
 
 // Serve static files from the dist directory in production (but not index.html at root)
-const distPath = path.join(__dirname, '..', 'dist');
+const distCandidates = [
+  path.join(process.cwd(), 'dist'),
+  path.join(__dirname, '..', 'dist'),
+  path.join(__dirname, '..', '..', 'dist'),
+];
+const distPath = distCandidates.find(candidate => fs.existsSync(candidate)) ?? distCandidates[0];
 app.use(express.static(distPath));
 
 // Store active rooms and users
