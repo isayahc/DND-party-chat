@@ -10,12 +10,11 @@ interface User {
 
 interface VoiceCallProps {
   socket: Socket | null;
-  room: string;
   username: string;
   userId: string;
 }
 
-export const VoiceCall = ({ socket, room, username, userId }: VoiceCallProps) => {
+export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
   const [isInCall, setIsInCall] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -27,7 +26,6 @@ export const VoiceCall = ({ socket, room, username, userId }: VoiceCallProps) =>
 
   const { peers, createOffer, closeAllConnections } = useWebRTC({
     socket,
-    userId,
     localStream,
   });
 

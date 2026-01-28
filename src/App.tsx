@@ -120,7 +120,6 @@ function App() {
         <div className="voice-section">
           <VoiceCall
             socket={socket}
-            room={room}
             username={username}
             userId={socket?.id || ''}
           />

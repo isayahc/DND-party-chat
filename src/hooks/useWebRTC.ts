@@ -3,7 +3,6 @@ import { Socket } from 'socket.io-client';
 
 interface UseWebRTCProps {
   socket: Socket | null;
-  userId: string;
   localStream: MediaStream | null;
 }
 
@@ -19,7 +18,7 @@ const configuration: RTCConfiguration = {
   ],
 };
 
-export const useWebRTC = ({ socket, userId, localStream }: UseWebRTCProps) => {
+export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
   const [peers, setPeers] = useState<Map<string, PeerConnection>>(new Map());
   const peersRef = useRef<Map<string, PeerConnection>>(new Map());
 
@@ -161,7 +160,7 @@ export const useWebRTC = ({ socket, userId, localStream }: UseWebRTCProps) => {
   }, []);
 
   const closeAllConnections = useCallback(() => {
-    peersRef.current.forEach((peer, userId) => {
+    peersRef.current.forEach((peer) => {
       peer.connection.close();
     });
     setPeers(new Map());
