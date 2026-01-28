@@ -39,9 +39,13 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
         return [...prev, data];
       });
 
-      // If we're in a call, create an offer to the new user
-      if (isInCall && data.userId !== userId) {
-        createOffer(data.userId);
+      // If we're in a call and have a local stream, create an offer to the new user
+      if (isInCall && localStream && data.userId !== userId) {
+        console.log(`Creating offer to newly joined user: ${data.username}`);
+        // Small delay to ensure everything is set up
+        setTimeout(() => {
+          createOffer(data.userId);
+        }, 100);
       }
     };
 
@@ -49,11 +53,14 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
       console.log("Room users:", users);
       setRemoteUsers(users.filter((u) => u.userId !== userId));
 
-      // Create offers to all existing users when joining
-      if (isInCall) {
+      // Create offers to all existing users when joining (only if we have local stream)
+      if (isInCall && localStream) {
+        console.log('Creating offers to existing room users:', users.length - 1);
         users.forEach((user) => {
           if (user.userId !== userId) {
-            createOffer(user.userId);
+            setTimeout(() => {
+              createOffer(user.userId);
+            }, 100);
           }
         });
       }
@@ -73,35 +80,53 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
       socket.off("room-users", handleRoomUsers);
       socket.off("user-left", handleUserLeft);
     };
-  }, [socket, createOffer, isInCall, userId]);
+  }, [socket, createOffer, isInCall, userId, localStream]);
+
+  // Create offers to existing users when we have a local stream and are in a call
+  useEffect(() => {
+    if (localStream && isInCall) {
+      console.log('Local stream available, creating offers to existing users:', remoteUsers.length);
+      // Small delay to ensure the stream is fully set up
+      setTimeout(() => {
+        remoteUsers.forEach((user) => {
+          console.log(`Creating offer to user: ${user.username} (${user.userId})`);
+          createOffer(user.userId);
+        });
+      }, 100);
+    }
+  }, [localStream, isInCall, remoteUsers, createOffer]);
 
   // Update remote audio elements when peers change
   useEffect(() => {
     console.log("Peers updated:", peers.size);
     peers.forEach((peer, peerId) => {
-      console.log(`Peer ${peerId}:`, {
+      const user = remoteUsers.find(u => u.userId === peerId);
+      console.log(`Peer ${peerId} (${user?.username || 'unknown'}):`, {
         hasStream: !!peer.stream,
+        streamId: peer.stream?.id,
         tracks: peer.stream
           ?.getTracks()
           .map((t) => ({
             kind: t.kind,
             enabled: t.enabled,
             readyState: t.readyState,
+            id: t.id,
           })),
         hasAudioElement: remoteAudioRefs.current.has(peerId),
       });
 
       if (peer.stream) {
         const audioElement = remoteAudioRefs.current.get(peerId);
-        if (audioElement) {
+        if (audioElement && audioElement.srcObject !== peer.stream) {
+          console.log(`Setting stream for audio element of ${user?.username || peerId}`);
           audioElement.srcObject = peer.stream;
           void audioElement.play().catch((error) => {
-            console.warn("Failed to play remote audio stream:", error);
+            console.warn(`Failed to play remote audio stream for ${user?.username || peerId}:`, error);
           });
         }
       }
     });
-  }, [peers]);
+  }, [peers, remoteUsers]);
 
   // Cleanup on component unmount
   useEffect(() => {
