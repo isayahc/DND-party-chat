@@ -63,8 +63,41 @@ export default tseslint.config({
 
 ## Running the project
 
+### Prerequisites
+This project uses [Bun](https://bun.sh) as the JavaScript runtime and package manager.
+
+### Installation
+1. Install Bun (if not already installed):
+```bash
+curl -fsSL https://bun.sh/install | bash
 ```
+
+2. Install dependencies:
+```bash
 cd dnd-party-chat
-pnpm install
-pnpm run dev
+bun install
+```
+
+### Development
+Start the development server:
+```bash
+bun run dev
+```
+
+### Build
+Build the project for production:
+```bash
+bun run build
+```
+
+### Linting
+Run the linter:
+```bash
+bun run lint
+```
+
+### Preview
+Preview the production build:
+```bash
+bun run preview
 ```
