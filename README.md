@@ -65,6 +65,8 @@ export default tseslint.config({
 
 This project uses [Bun](https://bun.sh) as its JavaScript runtime and package manager.
 
+> **Note**: This project has been migrated from PNPM to Bun. See [BUN_MIGRATION.md](./BUN_MIGRATION.md) for migration details and command mappings.
+
 ### Why Bun?
 
 Bun is an all-in-one JavaScript runtime & toolkit designed for speed:
