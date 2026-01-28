@@ -129,7 +129,7 @@ Expected improvements when using Bun:
 1. **Installation Speed**: 2-10x faster than npm/yarn/pnpm
 2. **Script Execution**: Faster startup times for npm scripts
 3. **Development Server**: Comparable performance to Node.js + Vite
-4. **Built Process**: Similar performance (Vite still does the bundling)
+4. **Build Process**: Similar performance (Vite still does the bundling)
 
 ## Rollback Plan
 
