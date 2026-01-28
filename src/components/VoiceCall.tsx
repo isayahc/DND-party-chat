@@ -88,7 +88,7 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
         }
       }
     });
-  }, [peers, remoteUsers]);
+  }, [peers]);
 
   // Cleanup on component unmount
   useEffect(() => {
