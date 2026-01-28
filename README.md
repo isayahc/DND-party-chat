@@ -61,10 +61,60 @@ export default tseslint.config({
 });
 ```
 
+## Prerequisites
+
+This project uses [Bun](https://bun.sh) as its JavaScript runtime and package manager.
+
+### Why Bun?
+
+Bun is an all-in-one JavaScript runtime & toolkit designed for speed:
+- **Fast package installation** - significantly faster than npm/yarn/pnpm
+- **Built-in TypeScript support** - no need for ts-node
+- **Native bundler** - built-in bundler, transpiler, and task runner
+- **Drop-in replacement** - compatible with Node.js and npm packages
+
+### Installing Bun
+
+To install Bun, run:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+Or on Windows:
+
+```powershell
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
+
+For more installation options, visit [https://bun.sh](https://bun.sh)
+
 ## Running the project
 
-```
+```bash
 cd dnd-party-chat
-pnpm install
-pnpm run dev
+bun install
+bun run dev
 ```
+
+## Available Scripts
+
+- `bun run dev` - Start development server with HMR
+- `bun run build` - Build for production (includes type checking)
+- `bun run typecheck` - Run TypeScript type checking
+- `bun run lint` - Run ESLint
+- `bun run preview` - Preview production build
+
+## Dependency Compatibility
+
+All dependencies in this project are fully compatible with Bun:
+
+### Runtime Dependencies
+- **react** (^19.0.0) - ✅ Fully supported
+- **react-dom** (^19.0.0) - ✅ Fully supported
+
+### Development Dependencies
+- **vite** (^6.2.0) - ✅ Fully supported, runs natively with Bun
+- **typescript** (~5.7.2) - ✅ Fully supported, Bun has built-in TS transpiler
+- **eslint** (^9.21.0) - ✅ Fully supported
+- All other dev dependencies - ✅ Fully supported
