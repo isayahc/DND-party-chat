@@ -57,6 +57,7 @@ const distCandidates = [
   path.join(__dirname, '..', '..', 'dist'),
 ];
 const distPath = distCandidates.find(candidate => fs.existsSync(candidate)) ?? distCandidates[0];
+console.log(`Serving static assets from: ${distPath}`);
 app.use(express.static(distPath));
 
 // Store active rooms and users
