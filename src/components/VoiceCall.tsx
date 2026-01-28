@@ -90,10 +90,8 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
   // Cleanup on component unmount
   useEffect(() => {
     return () => {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-      closeAllConnections();
+      localStream?.getTracks().forEach(track => track.stop());
+      closeAllConnections?.();
     };
   }, [localStream, closeAllConnections]);
 

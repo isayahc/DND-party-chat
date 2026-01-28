@@ -74,7 +74,7 @@ export const Chat = ({ socket, room, username }: ChatProps) => {
         ) : (
           messages.map((msg, index) => (
             <div
-              key={index}
+              key={`${msg.timestamp}-${msg.userId || msg.username}-${index}`}
               className={`message ${msg.username === username ? 'own-message' : ''} ${
                 msg.username === 'System' ? 'system-message' : ''
               }`}
