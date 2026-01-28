@@ -14,7 +14,8 @@ function App() {
 
   useEffect(() => {
     // Connect to Socket.IO server
-    const newSocket = io('http://localhost:3001');
+    const serverUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+    const newSocket = io(serverUrl);
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -54,7 +55,8 @@ function App() {
     // Reconnect to clear state
     if (socket) {
       socket.close();
-      const newSocket = io('http://localhost:3001');
+      const serverUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+      const newSocket = io(serverUrl);
       setSocket(newSocket);
     }
   };

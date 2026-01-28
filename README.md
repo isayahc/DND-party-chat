@@ -118,6 +118,12 @@ cd dnd-party-chat
 bun install
 ```
 
+3. (Optional) Configure environment variables:
+```bash
+cp .env.example .env
+# Edit .env to customize server URL and port if needed
+```
+
 ### Development
 Start the development server:
 ```bash
