@@ -1,0 +1,24 @@
+# Bun configuration file
+# See https://bun.sh/docs/runtime/bunfig for more options
+
+[install]
+# Install behavior
+# "auto" - use system-wide cache
+# "force" - ignore cache
+cache = "auto"
+
+# Registry configuration
+registry = "https://registry.npmjs.org"
+
+[install.scopes]
+# Configure scoped registries if needed
+# "@myorg" = "https://registry.myorg.com"
+
+[run]
+# Scripts to run before/after install
+# pre = ["echo 'Pre-install'"]
+# post = ["echo 'Post-install'"]
+
+[test]
+# Test runner configuration
+# preload = ["./setup.ts"]
