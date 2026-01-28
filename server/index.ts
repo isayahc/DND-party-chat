@@ -28,6 +28,18 @@ interface Room {
   users: Set<string>;
 }
 
+// WebRTC signaling types
+interface RTCSessionDescriptionLike {
+  type: 'offer' | 'answer';
+  sdp: string;
+}
+
+interface RTCIceCandidateLike {
+  candidate: string;
+  sdpMLineIndex: number | null;
+  sdpMid: string | null;
+}
+
 const rooms = new Map<string, Room>();
 const users = new Map<string, User>();
 
@@ -93,7 +105,7 @@ io.on('connection', (socket) => {
   });
 
   // WebRTC Signaling - Offer
-  socket.on('webrtc-offer', ({ targetId, offer }: { targetId: string; offer: any }) => {
+  socket.on('webrtc-offer', ({ targetId, offer }: { targetId: string; offer: RTCSessionDescriptionLike }) => {
     const user = users.get(socket.id);
     if (user) {
       io.to(targetId).emit('webrtc-offer', {
@@ -105,7 +117,7 @@ io.on('connection', (socket) => {
   });
 
   // WebRTC Signaling - Answer
-  socket.on('webrtc-answer', ({ targetId, answer }: { targetId: string; answer: any }) => {
+  socket.on('webrtc-answer', ({ targetId, answer }: { targetId: string; answer: RTCSessionDescriptionLike }) => {
     io.to(targetId).emit('webrtc-answer', {
       userId: socket.id,
       answer,
@@ -113,7 +125,7 @@ io.on('connection', (socket) => {
   });
 
   // WebRTC Signaling - ICE Candidate
-  socket.on('webrtc-ice-candidate', ({ targetId, candidate }: { targetId: string; candidate: any }) => {
+  socket.on('webrtc-ice-candidate', ({ targetId, candidate }: { targetId: string; candidate: RTCIceCandidateLike }) => {
     io.to(targetId).emit('webrtc-ice-candidate', {
       userId: socket.id,
       candidate,
