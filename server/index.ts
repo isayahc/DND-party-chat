@@ -56,8 +56,13 @@ const distCandidates = [
   path.join(__dirname, '..', 'dist'),
   path.join(__dirname, '..', '..', 'dist'),
 ];
-const distPath = distCandidates.find(candidate => fs.existsSync(candidate)) ?? distCandidates[0];
-console.log(`Serving static assets from: ${distPath}`);
+const resolvedDistPath = distCandidates.find(candidate => fs.existsSync(candidate));
+const distPath = resolvedDistPath ?? distCandidates[0];
+if (!resolvedDistPath) {
+  console.warn(`No dist directory found in expected locations. Falling back to ${distPath}.`);
+} else if (process.env.NODE_ENV !== 'production') {
+  console.log(`Serving static assets from: ${distPath}`);
+}
 app.use(express.static(distPath));
 
 // Store active rooms and users
