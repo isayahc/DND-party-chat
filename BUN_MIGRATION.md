@@ -11,10 +11,10 @@ This project has been migrated from PNPM to Bun as its package manager and JavaS
 
 ### New Files
 - `bunfig.toml` - Bun configuration file
-- `bun.lockb` - Bun's lockfile (binary format, committed to git)
+- `bun.lockb` - Bun's lockfile (binary format, **committed to git**)
 
 ### Updated Files
-- `.gitignore` - added `bun.lockb` 
+- `.gitignore` - no Bun-specific entries needed (bun.lockb is committed)
 - `README.md` - updated with Bun instructions
 - `package.json` - added `typecheck` script
 

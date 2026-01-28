@@ -13,9 +13,10 @@ This document outlines the verification steps for the Bun migration.
 ### 1. Package Manager Migration
 - [x] Removed `pnpm-lock.yaml`
 - [x] Created placeholder for `bun.lockb` (to be generated on first `bun install`)
+- [x] Ensured `bun.lockb` will be committed to version control
 
 ### 2. Configuration Updates
-- [x] Updated `.gitignore` to include `bun.lockb`
+- [x] Ensured `.gitignore` does NOT exclude `bun.lockb` (it should be committed)
 - [x] Created `bunfig.toml` with Bun configuration
 - [x] Added `typecheck` script to `package.json` for explicit type checking
 
