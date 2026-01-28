@@ -9,6 +9,46 @@ Currently, two official plugins are available:
 
 ## Party Chat
 
+A real-time voice and text chat application for D&D parties, enabling players to communicate during their gaming sessions.
+
+### Features
+
+#### Voice Call
+- **WebRTC-based voice communication**: Real-time peer-to-peer audio communication
+- **Join/Leave calls**: Easily connect and disconnect from voice channels
+- **Mute/Unmute**: Control your microphone with a single click
+- **Participant list**: See who's currently in the voice call
+- **Error handling**: Clear feedback when microphone access is not available
+
+#### Text Chat
+- **Real-time messaging**: Instant message delivery using WebSocket (Socket.IO)
+- **Room-based chat**: Organize conversations by room
+- **System notifications**: Get notified when users join or leave
+- **Message history**: See all messages in the current session
+- **Timestamps**: Track when messages were sent
+- **Auto-scroll**: Automatically scroll to the latest messages
+
+### Technical Stack
+
+**Frontend:**
+- React 19 with TypeScript
+- Socket.IO Client for WebSocket communication
+- WebRTC for peer-to-peer voice calls
+- Vite for build tooling
+
+**Backend:**
+- Express server
+- Socket.IO for real-time communication
+- WebRTC signaling server for establishing peer connections
+
+### Architecture
+
+The application uses a client-server architecture:
+- **Frontend**: React application running on port 5173 (development)
+- **Backend**: Express/Socket.IO server running on port 3001
+
+The voice calls use WebRTC for direct peer-to-peer communication, with the server acting as a signaling server to exchange connection information (offers, answers, and ICE candidates).
+
 
 
 

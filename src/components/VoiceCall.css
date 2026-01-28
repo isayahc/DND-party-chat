@@ -1,0 +1,153 @@
+.voice-call-container {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #3a3a3a;
+}
+
+.voice-call-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.voice-call-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.call-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.status-indicator.active {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.error-message {
+  background-color: #ff4444;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 150px;
+}
+
+.btn-primary {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: #646cff;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #535bf2;
+}
+
+.btn-danger {
+  background-color: #ff4444;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #cc0000;
+}
+
+.participants {
+  background-color: #1a1a1a;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.participants h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.participant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background-color: #2a2a2a;
+  border-radius: 4px;
+  border: 1px solid #3a3a3a;
+}
+
+.participant.own-participant {
+  border-color: #646cff;
+  background-color: #2a2a4a;
+}
+
+.participant-name {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.muted-badge {
+  font-size: 0.85rem;
+  color: #ff4444;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(255, 68, 68, 0.1);
+  border-radius: 4px;
+}
+
+.no-participants {
+  text-align: center;
+  color: #888;
+  padding: 1rem;
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .controls {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
