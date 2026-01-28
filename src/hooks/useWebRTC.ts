@@ -29,10 +29,6 @@ export const useWebRTC = ({ socket, localStream }: UseWebRTCProps) => {
   const createPeerConnection = useCallback(
     (targetUserId: string): RTCPeerConnection => {
       const peerConnection = new RTCPeerConnection(configuration);
-      
-      // Store pending ICE candidates
-      const pendingCandidates: RTCIceCandidate[] = [];
-      let isRemoteDescriptionSet = false;
 
       // Add local stream tracks to the connection
       if (localStream) {
