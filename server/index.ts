@@ -178,6 +178,7 @@ io.on('connection', (socket) => {
 
     const user = users.get(socket.id);
     if (user) {
+      console.log(`user ${user.username} is speak`);
       const sanitizedMessage = message.trim().substring(0, 1000);
       io.to(room).emit('message', {
         userId: socket.id,
