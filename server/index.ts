@@ -51,56 +51,88 @@ io.on('connection', (socket) => {
 
   // Join a room
   socket.on('join-room', ({ room, username }: { room: string; username: string }) => {
-    console.log(`${username} joining room: ${room}`);
+    // Validate inputs
+    if (!username || typeof username !== 'string' || username.trim().length === 0) {
+      socket.emit('error', { message: 'Invalid username' });
+      return;
+    }
+    if (!room || typeof room !== 'string' || room.trim().length === 0) {
+      socket.emit('error', { message: 'Invalid room name' });
+      return;
+    }
+    if (username.length > 50) {
+      socket.emit('error', { message: 'Username too long (max 50 characters)' });
+      return;
+    }
+    if (room.length > 50) {
+      socket.emit('error', { message: 'Room name too long (max 50 characters)' });
+      return;
+    }
+
+    const sanitizedUsername = username.trim().substring(0, 50);
+    const sanitizedRoom = room.trim().substring(0, 50);
     
-    socket.join(room);
+    console.log(`${sanitizedUsername} joining room: ${sanitizedRoom}`);
+    
+    socket.join(sanitizedRoom);
     
     // Store user info
     users.set(socket.id, {
       id: socket.id,
-      username,
-      room,
+      username: sanitizedUsername,
+      room: sanitizedRoom,
       isMuted: false,
     });
 
     // Update or create room
-    if (!rooms.has(room)) {
-      rooms.set(room, { name: room, users: new Set() });
+    if (!rooms.has(sanitizedRoom)) {
+      rooms.set(sanitizedRoom, { name: sanitizedRoom, users: new Set() });
     }
-    rooms.get(room)!.users.add(socket.id);
+    rooms.get(sanitizedRoom)!.users.add(socket.id);
 
     // Notify others in the room
-    socket.to(room).emit('user-joined', {
+    socket.to(sanitizedRoom).emit('user-joined', {
       userId: socket.id,
-      username,
+      username: sanitizedUsername,
     });
 
     // Send current users to the new user
-    const roomUsers = Array.from(rooms.get(room)!.users)
+    const roomUsers = Array.from(rooms.get(sanitizedRoom)!.users)
       .filter(id => id !== socket.id)
-      .map(id => ({
-        userId: id,
-        username: users.get(id)?.username,
-      }));
+      .map(id => {
+        const user = users.get(id);
+        return user ? { userId: id, username: user.username } : null;
+      })
+      .filter((user): user is { userId: string; username: string } => user !== null);
     
     socket.emit('room-users', roomUsers);
 
     // Send join confirmation
-    io.to(room).emit('message', {
+    io.to(sanitizedRoom).emit('message', {
       username: 'System',
-      message: `${username} has joined the room`,
+      message: `${sanitizedUsername} has joined the room`,
       timestamp: new Date().toISOString(),
     });
   });
 
   // Handle text chat messages
   socket.on('send-message', ({ room, message }: { room: string; message: string }) => {
+    // Validate message
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return; // Silently ignore empty messages
+    }
+    if (message.length > 1000) {
+      socket.emit('error', { message: 'Message too long (max 1000 characters)' });
+      return;
+    }
+
     const user = users.get(socket.id);
     if (user) {
+      const sanitizedMessage = message.trim().substring(0, 1000);
       io.to(room).emit('message', {
         userId: socket.id,
         username: user.username,
-        message,
+        message: sanitizedMessage,
         timestamp: new Date().toISOString(),
       });
     }

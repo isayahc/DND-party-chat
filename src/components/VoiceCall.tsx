@@ -87,6 +87,16 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
     });
   }, [peers]);
 
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+      closeAllConnections();
+    };
+  }, [localStream, closeAllConnections]);
+
   const joinCall = async () => {
     try {
       setError(null);
