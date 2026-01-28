@@ -82,6 +82,9 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
         const audioElement = remoteAudioRefs.current.get(peerId);
         if (audioElement) {
           audioElement.srcObject = peer.stream;
+          void audioElement.play().catch((error) => {
+            console.warn('Failed to play remote audio stream:', error);
+          });
         }
       }
     });
@@ -207,7 +210,6 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
                     remoteAudioRefs.current.delete(user.userId);
                   }
                 }}
-                autoPlay
               />
             </div>
           ))}
