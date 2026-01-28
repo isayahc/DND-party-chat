@@ -22,16 +22,12 @@ const validateOrigin = (origin: string | undefined, callback: (err: Error | null
   // Allow requests with no origin (like mobile apps or curl requests)
   if (!origin) return callback(null, true);
   
-  // Allow same-origin requests (when frontend is served from same server)
-  const serverPort = process.env.PORT || '3001';
-  const sameOriginUrls = [
-    `http://localhost:${serverPort}`,
-  ];
-  
-  // Check if the origin is in the allowed list or is same-origin
-  if (allowedOrigins.includes(origin) || sameOriginUrls.includes(origin)) {
+  // Check if the origin is in the allowed list
+  if (allowedOrigins.includes(origin)) {
     callback(null, true);
   } else {
+    console.log(`CORS rejected origin: ${origin}`); // helpful for debugging
+    console.log(`Allowed origins: ${allowedOrigins.join(', ')}`);
     callback(new Error('Not allowed by CORS'));
   }
 };
