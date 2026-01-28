@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { Socket } from 'socket.io-client';
-import { useWebRTC } from '../hooks/useWebRTC';
-import './VoiceCall.css';
+import { useState, useEffect, useRef } from "react";
+import { Socket } from "socket.io-client";
+import { useWebRTC } from "../hooks/useWebRTC";
+import "./VoiceCall.css";
 
 interface User {
   userId: string;
@@ -20,7 +20,7 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteUsers, setRemoteUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
-  
+
   const localAudioRef = useRef<HTMLAudioElement>(null);
   const remoteAudioRefs = useRef<Map<string, HTMLAudioElement>>(new Map());
 
@@ -33,12 +33,12 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
     if (!socket) return;
 
     const handleUserJoined = (data: User) => {
-      console.log('User joined:', data);
+      console.log("User joined:", data);
       setRemoteUsers((prev) => {
-        if (prev.some(u => u.userId === data.userId)) return prev;
+        if (prev.some((u) => u.userId === data.userId)) return prev;
         return [...prev, data];
       });
-      
+
       // If we're in a call, create an offer to the new user
       if (isInCall && data.userId !== userId) {
         createOffer(data.userId);
@@ -46,12 +46,12 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
     };
 
     const handleRoomUsers = (users: User[]) => {
-      console.log('Room users:', users);
-      setRemoteUsers(users.filter(u => u.userId !== userId));
-      
+      console.log("Room users:", users);
+      setRemoteUsers(users.filter((u) => u.userId !== userId));
+
       // Create offers to all existing users when joining
       if (isInCall) {
-        users.forEach(user => {
+        users.forEach((user) => {
           if (user.userId !== userId) {
             createOffer(user.userId);
           }
@@ -60,30 +60,43 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
     };
 
     const handleUserLeft = (data: User) => {
-      console.log('User left:', data);
+      console.log("User left:", data);
       setRemoteUsers((prev) => prev.filter((u) => u.userId !== data.userId));
     };
 
-    socket.on('user-joined', handleUserJoined);
-    socket.on('room-users', handleRoomUsers);
-    socket.on('user-left', handleUserLeft);
+    socket.on("user-joined", handleUserJoined);
+    socket.on("room-users", handleRoomUsers);
+    socket.on("user-left", handleUserLeft);
 
     return () => {
-      socket.off('user-joined', handleUserJoined);
-      socket.off('room-users', handleRoomUsers);
-      socket.off('user-left', handleUserLeft);
+      socket.off("user-joined", handleUserJoined);
+      socket.off("room-users", handleRoomUsers);
+      socket.off("user-left", handleUserLeft);
     };
   }, [socket, createOffer, isInCall, userId]);
 
   // Update remote audio elements when peers change
   useEffect(() => {
+    console.log("Peers updated:", peers.size);
     peers.forEach((peer, peerId) => {
+      console.log(`Peer ${peerId}:`, {
+        hasStream: !!peer.stream,
+        tracks: peer.stream
+          ?.getTracks()
+          .map((t) => ({
+            kind: t.kind,
+            enabled: t.enabled,
+            readyState: t.readyState,
+          })),
+        hasAudioElement: remoteAudioRefs.current.has(peerId),
+      });
+
       if (peer.stream) {
         const audioElement = remoteAudioRefs.current.get(peerId);
         if (audioElement) {
           audioElement.srcObject = peer.stream;
           void audioElement.play().catch((error) => {
-            console.warn('Failed to play remote audio stream:', error);
+            console.warn("Failed to play remote audio stream:", error);
           });
         }
       }
@@ -93,7 +106,7 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
   // Cleanup on component unmount
   useEffect(() => {
     return () => {
-      localStream?.getTracks().forEach(track => track.stop());
+      localStream?.getTracks().forEach((track) => track.stop());
       closeAllConnections?.();
     };
   }, [localStream, closeAllConnections]);
@@ -113,14 +126,14 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
       setIsInCall(true);
 
       // Create offers to all existing users
-      remoteUsers.forEach(user => {
+      remoteUsers.forEach((user) => {
         createOffer(user.userId);
       });
 
-      console.log('Joined call successfully');
+      console.log("Joined call successfully");
     } catch (err) {
-      console.error('Error accessing microphone:', err);
-      setError('Failed to access microphone. Please check your permissions.');
+      console.error("Error accessing microphone:", err);
+      setError("Failed to access microphone. Please check your permissions.");
     }
   };
 
@@ -133,7 +146,7 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
     closeAllConnections();
     setIsInCall(false);
     setIsMuted(false);
-    console.log('Left call');
+    console.log("Left call");
   };
 
   const toggleMute = () => {
@@ -142,10 +155,10 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         setIsMuted(!audioTrack.enabled);
-        
+
         // Notify server about mute status
         if (socket) {
-          socket.emit('toggle-mute', { isMuted: !audioTrack.enabled });
+          socket.emit("toggle-mute", { isMuted: !audioTrack.enabled });
         }
       }
     }
@@ -164,11 +177,7 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
         </div>
       </div>
 
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
+      {error && <div className="error-message">{error}</div>}
 
       <div className="controls">
         {!isInCall ? (
@@ -179,9 +188,9 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
           <>
             <button
               onClick={toggleMute}
-              className={`btn ${isMuted ? 'btn-danger' : 'btn-secondary'}`}
+              className={`btn ${isMuted ? "btn-danger" : "btn-secondary"}`}
             >
-              {isMuted ? '🔇 Unmute' : '🎤 Mute'}
+              {isMuted ? "🔇 Unmute" : "🎤 Mute"}
             </button>
             <button onClick={leaveCall} className="btn btn-danger">
               📞 Leave Call
@@ -199,20 +208,21 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
               {isMuted && <span className="muted-badge">🔇 Muted</span>}
             </div>
           )}
-          {isInCall && remoteUsers.map((user) => (
-            <div key={user.userId} className="participant">
-              <span className="participant-name">{user.username}</span>
-              <audio
-                ref={(el) => {
-                  if (el) {
-                    remoteAudioRefs.current.set(user.userId, el);
-                  } else {
-                    remoteAudioRefs.current.delete(user.userId);
-                  }
-                }}
-              />
-            </div>
-          ))}
+          {isInCall &&
+            remoteUsers.map((user) => (
+              <div key={user.userId} className="participant">
+                <span className="participant-name">{user.username}</span>
+                <audio
+                  ref={(el) => {
+                    if (el) {
+                      remoteAudioRefs.current.set(user.userId, el);
+                    } else {
+                      remoteAudioRefs.current.delete(user.userId);
+                    }
+                  }}
+                />
+              </div>
+            ))}
         </div>
         {!isInCall && (
           <div className="no-participants">
