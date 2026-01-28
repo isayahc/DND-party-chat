@@ -6,15 +6,35 @@ import cors from 'cors';
 const app = express();
 const httpServer = createServer(app);
 
+// Configure allowed origins for CORS
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+const allowedOrigins = CLIENT_URL.split(',').map(url => url.trim());
+
+// CORS origin validation function
+const validateOrigin = (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+  // Allow requests with no origin (like mobile apps or curl requests)
+  if (!origin) return callback(null, true);
+  
+  // Check if the origin is in the allowed list (exact match)
+  if (allowedOrigins.includes(origin)) {
+    callback(null, true);
+  } else {
+    callback(new Error('Not allowed by CORS'));
+  }
+};
+
 const io = new Server(httpServer, {
   cors: {
-    origin: CLIENT_URL,
+    origin: validateOrigin,
     methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: validateOrigin,
+  credentials: true,
+}));
 app.use(express.json());
 
 // Store active rooms and users
