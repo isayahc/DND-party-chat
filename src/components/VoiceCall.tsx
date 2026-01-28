@@ -82,11 +82,13 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
         const audioElement = remoteAudioRefs.current.get(peerId);
         if (audioElement) {
           audioElement.srcObject = peer.stream;
-          void audioElement.play().catch(() => undefined);
+          void audioElement.play().catch((error) => {
+            console.warn('Failed to play remote audio stream:', error);
+          });
         }
       }
     });
-  }, [peers]);
+  }, [peers, remoteUsers]);
 
   // Cleanup on component unmount
   useEffect(() => {
@@ -204,16 +206,10 @@ export const VoiceCall = ({ socket, username, userId }: VoiceCallProps) => {
                 ref={(el) => {
                   if (el) {
                     remoteAudioRefs.current.set(user.userId, el);
-                    const peer = peers.get(user.userId);
-                    if (peer?.stream) {
-                      el.srcObject = peer.stream;
-                      void el.play().catch(() => undefined);
-                    }
                   } else {
                     remoteAudioRefs.current.delete(user.userId);
                   }
                 }}
-                autoPlay
               />
             </div>
           ))}
